@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import FotoItem from './FotoItem';
 import Pubsub from 'pubsub-js';
+import TimelineApi from '../store/TimeLineApi';
 
 export default class Timeline extends Component {
 
@@ -13,15 +14,9 @@ export default class Timeline extends Component {
   }
 
   componentWillMount(){
-    this.props.store.subscribe(fotos => this.setState({fotos}));
-  }
-
-  like(fotoId) {
-    this.props.store.like(fotoId)
-  }
-
-  comenta(fotoId,textoComentario) {
-    this.props.store.comenta(fotoId, textoComentario);
+    this.props.store.subscribe(() => {
+      this.setState({fotos:this.props.store.getState().TimelineReducer}); 
+    });
   }
 
   carregaFotos(){  
@@ -32,8 +27,17 @@ export default class Timeline extends Component {
     } else {
       urlPerfil = `http://localhost:8080/api/public/fotos/${this.login}`;
     }
-    this.props.store.lista(urlPerfil);
+    this.props.store.dispatch(TimelineApi.lista(urlPerfil));
   }
+
+  like(fotoId) {
+    this.props.store.dispatch(TimelineApi.like(fotoId));
+  }
+
+  comenta(fotoId,textoComentario) {
+    this.props.store.dispatch(TimelineApi.comenta(fotoId, textoComentario));
+  }
+
 
   componentDidMount() {
     this.carregaFotos()
