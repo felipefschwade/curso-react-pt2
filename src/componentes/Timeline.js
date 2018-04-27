@@ -1,22 +1,13 @@
 import React, { Component } from 'react';
 import FotoItem from './FotoItem';
-import Pubsub from 'pubsub-js';
 import TimelineApi from '../store/TimeLineApi';
+import {connect} from 'react-redux';
 
-export default class Timeline extends Component {
+class Timeline extends Component {
 
   constructor(props) {
     super(props);
-    this.state={
-      fotos:[]
-    };
     this.login = this.props.login;
-  }
-
-  componentWillMount(){
-    this.props.store.subscribe(() => {
-      this.setState({fotos:this.props.store.getState().TimelineReducer}); 
-    });
   }
 
   carregaFotos(){  
@@ -27,24 +18,15 @@ export default class Timeline extends Component {
     } else {
       urlPerfil = `http://localhost:8080/api/public/fotos/${this.login}`;
     }
-    this.props.store.dispatch(TimelineApi.lista(urlPerfil));
+    this.props.lista(urlPerfil);
   }
-
-  like(fotoId) {
-    this.props.store.dispatch(TimelineApi.like(fotoId));
-  }
-
-  comenta(fotoId,textoComentario) {
-    this.props.store.dispatch(TimelineApi.comenta(fotoId, textoComentario));
-  }
-
 
   componentDidMount() {
     this.carregaFotos()
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.login !== undefined) {
+    if (nextProps.login !== this.login) {
       this.login = nextProps.login;
       this.carregaFotos();
     }
@@ -54,9 +36,31 @@ export default class Timeline extends Component {
     return (
       <div className="fotos container">
         {
-          this.state.fotos.map(foto => <FotoItem key={foto.id} foto={foto} like={this.like.bind(this)} comenta={this.comenta.bind(this)}/>)
+          this.props.fotos.map(foto => <FotoItem key={foto.id} foto={foto} like={this.props.like} comenta={this.props.comenta}/>)
         }
       </div>            
     );
   }
 }
+
+const mapStateToProps = state => {
+  return {fotos: state.TimelineReducer}
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    like: (fotoId) => {
+      dispatch(TimelineApi.like(fotoId));
+    },
+    comenta : (fotoId,textoComentario) => {
+      dispatch(TimelineApi.comenta(fotoId, textoComentario));
+    },
+    lista : (urlPerfil) => {
+      dispatch(TimelineApi.lista(urlPerfil));
+    }
+  }
+};
+
+const TimelineContainer = connect(mapStateToProps, mapDispatchToProps)(Timeline);
+
+export default TimelineContainer;

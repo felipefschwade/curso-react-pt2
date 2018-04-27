@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import {Link} from 'react-router';
 class FotoAtualizacoes extends Component {
     
+  componentDidMount() {
+    console.log(this.props.foto)
+  }
+
   like(event){
     event.preventDefault();      
     this.props.like(this.props.foto.id);
@@ -33,7 +37,7 @@ class FotoInfo extends Component {
         <div className="foto-info-likes">
           {
             this.props.foto.likers.map(liker => {
-              return (<Link to={`/timeline/${liker.login}`}>{liker.login},</Link>)
+              return (<Link key={liker.login} to={`/timeline/${liker.login}`}>{liker.login},</Link>)
             })
           }
             curtiram
@@ -50,7 +54,7 @@ class FotoInfo extends Component {
           this.props.foto.comentarios.map(comentario => {
             return(
               <li className="comentario">
-                <Link to={`/timeline/${comentario.login}`} className="foto-info-autor">{comentario.login} </Link>
+                <Link key={comentario.login} to={`/timeline/${comentario.login}`} className="foto-info-autor">{comentario.login} </Link>
                 {comentario.texto}
               </li>
             )

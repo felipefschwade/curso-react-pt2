@@ -5,7 +5,7 @@ function trocaFoto(lista,fotoId,callbackAtualizaPropriedades){
   const fotoEstadoAntigo = lista.find(foto => foto.id === fotoId);        
   const novasPropriedades = callbackAtualizaPropriedades(fotoEstadoAntigo);
 
-  const fotoEstadoNovo = Object.assign({},fotoEstadoAntigo,novasPropriedades);
+  const fotoEstadoNovo = {...fotoEstadoAntigo, ...novasPropriedades}
   const indiceDaLista = lista.findIndex(foto => foto.id === fotoId);
 
   return lista.set(indiceDaLista,fotoEstadoNovo);    
@@ -13,18 +13,18 @@ function trocaFoto(lista,fotoId,callbackAtualizaPropriedades){
 
 export function TimelineReducer(state=[],action) {
 
-  if(action.type === 'LISTAGEM'){  
+  if(action.type === 'LISTAGEM') {
     return new List(action.fotos);
   }
 
-  if(action.type === 'COMENTARIO'){
+  if(action.type === 'COMENTARIO') {
     return trocaFoto(state,action.fotoId,fotoEstadoAntigo => {
       const novosComentarios = fotoEstadoAntigo.comentarios.concat(action.novoComentario); 
       return {comentarios:novosComentarios};
     });
   }
 
-  if(action.type === 'LIKE'){
+  if(action.type === 'LIKE') {
     return trocaFoto(state,action.fotoId,fotoEstadoAntigo => {
       const likeada = !fotoEstadoAntigo.likeada;
 
